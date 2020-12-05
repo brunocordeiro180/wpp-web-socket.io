@@ -21,17 +21,16 @@
 		</div>
 
 	</div>
-  </body>
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script>
-  var socket = io();
+  var socket = io("http://localhost:3333") // for latest version;
 
   socket.on("paring", (base64Url) => {
 	$(".code").html(`<p>Escaneie o <strong>QR Code</strong> abaixo para sincronizar</p><img src="${base64Url}" alt="">`)
   })
 
-  socket.on("successOnConnect", () => {
+  socket.on("success", () => {
 	$(".code").html("<p>Conexão realizada com sucesso</p>");
   })
 

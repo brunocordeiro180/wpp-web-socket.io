@@ -21,6 +21,7 @@
     "open": "^7.3.0",
     "puppeteer-extra-plugin-stealth": "^2.6.5",
     "socket.io": "^3.0.3",
+    "socket.io-client": "^3.0.3",
     "venom-bot": "^2.1.2"
   }
 }

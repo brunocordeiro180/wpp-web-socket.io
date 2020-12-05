@@ -1,7 +1,7 @@
 var express = require('express')
 var app = express();
 var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+var socket = require('socket.io-client')("http://localhost:3333");
 var venom = require('venom-bot');
 var open = require('open');
 const path = require('path');
@@ -15,27 +15,35 @@ let base64Url;
 let venomInstance;
 
 
-open("http://localhost:3000")
+// open("http://localhost:3333")
 
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', (socket) => {
-  venom
+// io.on('connection', (socket) => {
+  
+// });
+
+venom
   .create('session', (base64Qr) => {
     console.log('chegou até aqui no venom create')
     loading = true;
     base64Url = base64Qr;
 
-    socket.emit('paring', base64Qr);
+    socket.emit('join', {
+      name: 'cliente',
+      room: 'vendergas'
+    })
+
+    socket.emit("askParing", base64Url);
 
   }, 
   (statusSession, session) => {
     if (statusSession === 'qrReadSuccess') {
       console.log('escaneado')
-      socket.emit('successOnConnect')
+      socket.emit('successParing')
     }
   }, 
   {logQR: true, autoClose: 0})
@@ -45,10 +53,7 @@ io.on('connection', (socket) => {
   });
   console.log('a user connected');
   function start(client) {
-    socket.emit('join', {
-      name: 'cliente',
-      room: 'vendergas'
-    })
+
     client.onMessage(async msg => {
       if (msg.from !== 'status@broadcast') {
         if (msg.isMedia == true || msg.isMMS == true) {
@@ -140,8 +145,7 @@ io.on('connection', (socket) => {
       socket.emit('listenOldMessages', {clients: chats, hostDevice: device, unreadMessages : allUnreadMessages});
     })
   }
-});
 
-http.listen(3000, () => {
-  console.log('listening on *:3000');
+http.listen(4000, () => {
+  console.log('listening on *:4000');
 });
