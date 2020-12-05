@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+#app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.qrcode {
+  width: 200px;
+  height: 200px;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  margin-top: 25px;
+}
+
+.code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.kill {
+  width: 150px;
+  padding: 10px 6px;
+  background-color: #5a67d8;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+.authTitle {
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.authInfo {
+  font-size: 14px;
+}
+
+.isAuth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.loaderAnimation {
+  width: 25px;
+  height: 25px;
+  animation:spin 4s linear infinite;
+}
+
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

@@ -1,0 +1,26 @@
+{
+  "name": "teste",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "pkg": {
+    "assets": [
+      "node_modules/puppeteer-extra-plugin-stealth/**/*.*",
+      "index.html",
+      "public/*"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "open": "^7.3.0",
+    "puppeteer-extra-plugin-stealth": "^2.6.5",
+    "socket.io": "^3.0.3",
+    "venom-bot": "^2.1.2"
+  }
+}
