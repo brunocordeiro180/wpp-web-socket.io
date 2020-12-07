@@ -6,16 +6,16 @@
   </head>
   <body>
 	<div id="app">
-		<!-- <div v-if="loading" >
-			<img class="loaderAnimation" src="assets/loader.svg">
-		</div> -->
+		<div id="loading" >
+			<img class="loaderAnimation" src="loader.svg">
+		</div>
 
-		<!-- <div class="isAuth" v-if="authenticated" >
-			<img src="assets/check.svg">
+		<div class="isAuth" style="display: none;">
+			<img src="check.svg">
 			<p class="authTitle" >Você está autenticado!</p>
 			<p>Em caso de erros, encerre a sessão e gere um novo QR Code</p>
-			<button class="kill" @click="kill" >Encerrar</button>
-		</div> -->
+			<button class="kill" onclick="kill();" >Encerrar</button>
+		</div>
 		<div class="code" >
 			
 		</div>
@@ -26,13 +26,28 @@
 <script>
   var socket = io("http://localhost:3333") // for latest version;
 
-  socket.on("paring", (base64Url) => {
-	$(".code").html(`<p>Escaneie o <strong>QR Code</strong> abaixo para sincronizar</p><img src="${base64Url}" alt="">`)
-  })
+	socket.on("paring", (base64Url) => {
+		$('#loading').css("display", "none");
+		$(".code").html(`<p>Escaneie o <strong>QR Code</strong> abaixo para sincronizar</p><img src="${base64Url}" alt="">`);
+		$(".isAuth").css("display", "none");
+	})
 
-  socket.on("success", () => {
-	$(".code").html("<p>Conexão realizada com sucesso</p>");
-  })
+	socket.on("success", () => {
+		$('#loading').css("display", "none");
+		$(".code").html("<p><br>Conexão realizada com sucesso</p>");
+		$(".isAuth").css("display", "none");
+	})
+
+	socket.on("isAuthenticated", () => {
+		$('#loading').css("display", "none");
+		$(".isAuth").css("display", "inline");
+	})
+
+	function kill() {
+		$('#loading').css("display", "inline");
+		$(".isAuth").css("display", "none");
+		socket.emit('closeConnection')	
+	}
 
 </script>
 </html>
