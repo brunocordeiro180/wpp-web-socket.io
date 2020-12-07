@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-	<title>Socket.IO chat</title>
+	<title>Conectar</title>
 	<link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -26,46 +26,36 @@
 	<script>
 		var socket = io() // for latest version;
 
-		if(localStorage.getItem("isConnected")){
+		socket.on("loading", () => {
+			$('#loading').css("display", "inline");
+		})
+		
+		socket.on("loadingFalse", () => {
 			$('#loading').css("display", "none");
-			$(".isAuth").css("display", "inline");
-		}
-
-		if(localStorage.getItem("base64Url") != "false"){
-			$('#loading').css("display", "none");
-			$(".code").html(`<p>Escaneie o <strong>QR Code</strong> abaixo para sincronizar</p><img src="${localStorage.getItem('base64Url')}" alt="">`);
-			$(".isAuth").css("display", "none");
-		}
+		})
 
 		socket.on("paring", (base64Url) => {
 			$('#loading').css("display", "none");
 			$(".code").html(`<p>Escaneie o <strong>QR Code</strong> abaixo para sincronizar</p><img src="${base64Url}" alt="">`);
 			$(".isAuth").css("display", "none");
-			localStorage.setItem("base64Url", base64Url);
 		})
 
 		socket.on("success", () => {
 			$('#loading').css("display", "none");
 			$(".isAuth").css("display", "inline");
 			$(".code").html("");
-			localStorage.setItem("isConnected", true);
-			localStorage.setItem("base64Url", false);
 		})
 
 		socket.on("isAuthenticated", () => {
 			$('#loading').css("display", "none");
 			$(".isAuth").css("display", "inline");
 			$(".code").html("");
-			localStorage.setItem("isConnected", true);
-			localStorage.setItem("base64Url", false);
 		})
 
 		function kill() {
-			$('#loading').css("display", "inline");
+			console.log('k')
 			$(".isAuth").css("display", "none");
 			$(".code").html("");
-			localStorage.setItem("isConnected", false);
-			localStorage.setItem("base64Url", false);
 			socket.emit('closeConnection')	
 		}
 

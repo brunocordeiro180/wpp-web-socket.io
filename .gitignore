@@ -2,3 +2,5 @@ node_modules
 teste-linux
 teste-macos
 teste-win.exe
+tokens
+debug.log

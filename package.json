@@ -5,6 +5,7 @@
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
+    "dev": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "pkg": {
@@ -22,6 +23,6 @@
     "puppeteer-extra-plugin-stealth": "^2.6.5",
     "socket.io": "^3.0.3",
     "socket.io-client": "^3.0.3",
-    "venom-bot": "^2.1.2"
+    "venom-bot": "^2.0.22"
   }
 }
