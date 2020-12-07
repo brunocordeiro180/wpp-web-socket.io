@@ -1,6 +1,7 @@
 var express = require('express')
 var app = express();
 var http = require('http').createServer(app);
+var ioLocal = require('socket.io')(http)
 var socket = require('socket.io-client')("http://localhost:3333");
 var venom = require('venom-bot');
 var open = require('open');
@@ -21,51 +22,66 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-createVenom();
+ioLocal.on('connection', socketLocal => {
+  createVenom();
 
-function createVenom(){
-  venom
-  .create('session', (base64Qr) => {
-    console.log('chegou até aqui no venom create')
-    loading = true;
-    base64Url = base64Qr;
-    socket.emit('join', {
-      name: 'cliente',
-      room: 'vendergas'
+  function createVenom(){
+    venom
+    .create('session', (base64Qr) => {
+      console.log('chegou até aqui no venom create')
+      loading = true;
+      base64Url = base64Qr;
+
+      socketLocal.emit("paring", base64Url);
+    }, 
+    (statusSession, session) => {
+      if (statusSession === 'qrReadSuccess') {
+        console.log('escaneado')
+        socketLocal.emit('success')
+      }
+    }, 
+    {logQR: true, autoClose: 0})
+    .then((client) => {
+      socket.emit('join', {
+        name: 'cliente',
+        room: 'vendergas'
+      });
+      connClient = client;
+      socketLocal.emit("isAuthenticated");
+      start(client)
+    })
+    .catch((erro) => {
+      console.log(erro);
     });
+  }
 
-    socket.emit("askParing", base64Url);
-  }, 
-  (statusSession, session) => {
-    if (statusSession === 'qrReadSuccess') {
-      console.log('escaneado')
-      socket.emit('successParing')
-    }
-  }, 
-  {logQR: true, autoClose: 0})
-  .then((client) => {
-    connClient = client;
-    socket.emit("authenticate");
-    start(client)
-  })
-  .catch((erro) => {
-    console.log(erro);
-  });
-}
+    
+  function start(client) {
 
-  
-function start(client) {
+    client.onMessage(async msg => {
+      if (msg.from !== 'status@broadcast') {
+        if (msg.isMedia == true || msg.isMMS == true) {
+          try {
+            const buffer = await client.decryptFile(msg); 
+            let base64data = Buffer.from(buffer).toString('base64');
+            let imagebase64 = 'data:'+msg.mimetype+';base64,'+base64data;
 
-  client.onMessage(async msg => {
-    if (msg.from !== 'status@broadcast') {
-      if (msg.isMedia == true || msg.isMMS == true) {
-        try {
-          const buffer = await client.decryptFile(msg); 
-          let base64data = Buffer.from(buffer).toString('base64');
-          let imagebase64 = 'data:'+msg.mimetype+';base64,'+base64data;
-
+            socket.emit('moduleSend', {
+              msgContent: imagebase64,
+              type: msg.type,
+              from: msg.from,
+              to: msg.to,
+              name: msg.sender.pushname ? msg.sender.pushname : msg.from,
+              avatar: msg.sender.profilePicThumbObj.img ? msg.sender.profilePicThumbObj.img : 'none',
+              timestamp: msg.timestamp 
+            });
+          } catch (err) {
+            console.error(err);
+            console.log('Ocorreu um erro ao realizar decode64 do arquivo');
+          }    
+        }else{
           socket.emit('moduleSend', {
-            msgContent: imagebase64,
+            msgContent: msg.body,
             type: msg.type,
             from: msg.from,
             to: msg.to,
@@ -73,84 +89,78 @@ function start(client) {
             avatar: msg.sender.profilePicThumbObj.img ? msg.sender.profilePicThumbObj.img : 'none',
             timestamp: msg.timestamp 
           });
-        } catch (err) {
-          console.error(err);
-          console.log('Ocorreu um erro ao realizar decode64 do arquivo');
-        }    
-      }else{
-        socket.emit('moduleSend', {
-          msgContent: msg.body,
-          type: msg.type,
-          from: msg.from,
-          to: msg.to,
-          name: msg.sender.pushname ? msg.sender.pushname : msg.from,
-          avatar: msg.sender.profilePicThumbObj.img ? msg.sender.profilePicThumbObj.img : 'none',
-          timestamp: msg.timestamp 
-        });
-      }
-    } 
-  })
-
-  // Retrieve all unread message
-  //const messages = await client.getAllUnreadMessages();
-
-  client.onStateChange(state => {
-    if ('CONFLICT'.includes(state)) {
-      kill()
-      socket.emit('errorOnConnect')
-    }
-    if ('UNPAIRED'.includes(state)) {
-      kill()
-      socket.emit('errorOnConnect')
-    }
-    if('CONNECTED'.includes(state)) {
-      socket.emit('successOnConnect')
-    }
-  })
-
-  socket.on('frontReceive', async data => {
-    await client.sendSeen(data.to);
-    client.sendText(data.to, String(data.msgContent));
-  })
-
-  socket.on('markAsRead', async data => {
-    await client.sendSeen(data);
-  })
-
-  socket.on("oldMessages", async () => {
-    const chats = await client.getAllChats();
-    const device = await client.getHostDevice();
-    const allUnreadMessages = await client.getAllUnreadMessages();
-
-    allUnreadMessages.map(async (unreadMessage, i) => {
-
-      if(unreadMessage.isMedia || unreadMessage.isMMS){
-        const buffer = await client.decryptFile(unreadMessage); 
-        let base64data = Buffer.from(buffer).toString('base64');
-        let imagebase64 = 'data:'+unreadMessage.mimetype+';base64,'+base64data;
-        
-        allUnreadMessages[i].body = imagebase64;
-      }
-      
+        }
+      } 
     })
 
-    // var unreadMessages = [];
+    // Retrieve all unread message
+    //const messages = await client.getAllUnreadMessages();
 
-    // console.log(allUnreadMessages.length);
+    client.onStateChange(state => {
+      if ('CONFLICT'.includes(state)) {
+        kill()
+        socket.emit('errorOnConnect')
+      }
+      if ('UNPAIRED'.includes(state)) {
+        kill()
+        socket.emit('errorOnConnect')
+      }
+      if('CONNECTED'.includes(state)) {
+        socket.emit('successOnConnect')
+      }
+    })
 
-    // allUnreadMessages.map(unreadMessage => {
-    //   if(unreadMessage.invis == false)
-    //     unreadMessages.push(unreadMessage);
-    // })
+    socket.on('frontReceive', async data => {
+      await client.sendSeen(data.to);
+      client.sendText(data.to, String(data.msgContent));
+    })
 
-    
-    socket.emit('listenOldMessages', {clients: chats, hostDevice: device, unreadMessages : allUnreadMessages});
+    socket.on('markAsRead', async data => {
+      await client.sendSeen(data);
+    })
+
+    socket.on("oldMessages", async () => {
+      const chats = await client.getAllChats();
+      const device = await client.getHostDevice();
+      const allUnreadMessages = await client.getAllUnreadMessages();
+
+      allUnreadMessages.map(async (unreadMessage, i) => {
+
+        if(unreadMessage.isMedia || unreadMessage.isMMS){
+          const buffer = await client.decryptFile(unreadMessage); 
+          let base64data = Buffer.from(buffer).toString('base64');
+          let imagebase64 = 'data:'+unreadMessage.mimetype+';base64,'+base64data;
+          
+          allUnreadMessages[i].body = imagebase64;
+        }
+        
+      })
+
+      // var unreadMessages = [];
+
+      // console.log(allUnreadMessages.length);
+
+      // allUnreadMessages.map(unreadMessage => {
+      //   if(unreadMessage.invis == false)
+      //     unreadMessages.push(unreadMessage);
+      // })
+
+      
+      socket.emit('listenOldMessages', {clients: chats, hostDevice: device, unreadMessages : allUnreadMessages});
+    })
+  }
+
+  function kill(){
+    rimraf("tokens", () => {connClient.close(); createVenom()})
+  }
+
+  socketLocal.on('closeConnection', async () => {
+    await kill();
   })
-}
-
-socket.on('errorToModule', async () => {
-  await rimraf("tokens", () => {connClient.close(); createVenom()})
 })
+
+
+
 
 http.listen(4000, () => {
   console.log('listening on *:4000');
