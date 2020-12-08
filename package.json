@@ -1,13 +1,15 @@
 {
-  "name": "teste",
-  "version": "1.0.0",
+  "name": "wpp-venom-socket.io",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
-  "bin": "index.js",
+  "bin": {
+    "teste": "index.js"
+  },
   "scripts": {
     "dev": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "pkg index.js --out-path ./build"
+    "build": "pkg package.json --out-path ./build"
   },
   "pkg": {
     "assets": [
@@ -16,14 +18,19 @@
       "./public/*"
     ]
   },
-  "author": "",
+  "author": "Bruno",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "locate-chrome": "^0.1.1",
+    "nexe": "^3.3.7",
     "open": "^7.3.0",
+    "puppeteer": "^5.5.0",
+    "puppeteer-core": "^5.5.0",
     "puppeteer-extra-plugin-stealth": "^2.6.5",
-    "socket.io": "^3.0.3",
-    "socket.io-client": "^3.0.3",
-    "venom-bot": "^2.0.22"
+    "socket.io": "^3.0.4",
+    "socket.io-client": "^3.0.4",
+    "venom-bot": "^2.1.2",
+    "ws": "^7.4.1"
   }
 }

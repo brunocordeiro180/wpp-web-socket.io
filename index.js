@@ -1,14 +1,23 @@
+#!/usr/bin/env node
 var express = require('express')
 var app = express();
 var http = require('http').createServer(app);
 var ioLocal = require('socket.io')(http)
 var socket = require('socket.io-client')("http://localhost:3333");
 var venom = require('venom-bot');
+var locateChrome = require('locate-chrome');
 var open = require('open');
+var puppeteer = require('puppeteer');
 const rimraf = require('rimraf');
 const path = require('path');
 
 app.use(express.static(path.join(__dirname, 'public')))
+
+var chromiumExecutablePath = path.join(process.cwd(), 'chromium/linux-818858/chrome-linux/chrome');
+
+locateChrome(function(l) {
+  chromiumExecutablePath = l;
+});
 
 let base64Url = null;
 let connClient = null;
@@ -31,7 +40,7 @@ const init = () => {
         socket.emit('successOnConnect', { room: 'vendergas' })
       }
     }, 
-    {logQR: false, autoClose: 0})
+    {logQR: false, autoClose: 0, puppeteerOptions : { executablePath: chromiumExecutablePath }})
     .then(client => {
       connClient = client;
       ioLocal.emit("isAuthenticated");
@@ -124,7 +133,7 @@ function start(client) {
   socket.on("oldMessages", async () => {
     const chats = await client.getAllChats();
     const device = await client.getHostDevice();
-    const allUnreadMessages = await client.getAllUnreadMessages();
+    const allUnreadMessages = await client.getUnreadMessages(true,true,true);
     allUnreadMessages.map(async (unreadMessage, i) => {
       if(unreadMessage.isMedia || unreadMessage.isMMS){
         const buffer = await client.decryptFile(unreadMessage); 
@@ -153,9 +162,6 @@ ioLocal.on('connection', clientLocal => {
     socket.emit('errorOnConnect', { room: 'vendergas' })
   })
 })
-
-
-
 
 http.listen(4000, () => {
   open("http://localhost:4000")
