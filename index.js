@@ -28,7 +28,7 @@ const init = () => {
     (statusSession, session) => {
       if (statusSession === 'qrReadSuccess') {
         ioLocal.emit('success')
-        socket.emit('successOnConnect')
+        socket.emit('successOnConnect', { room: 'vendergas' })
       }
     }, 
     {logQR: false, autoClose: 0})
@@ -65,27 +65,34 @@ function start(client) {
           let imagebase64 = 'data:'+msg.mimetype+';base64,'+base64data;
 
           socket.emit('moduleSend', {
-            msgContent: imagebase64,
-            type: msg.type,
-            from: msg.from,
-            to: msg.to,
-            name: msg.sender.pushname ? msg.sender.pushname : msg.from,
-            avatar: msg.sender.profilePicThumbObj.img ? msg.sender.profilePicThumbObj.img : 'none',
-            timestamp: msg.timestamp 
-          });
+              room: 'vendergas',
+              data: {
+                msgContent: imagebase64,
+                type: msg.type,
+                from: msg.from,
+                to: msg.to,
+                name: msg.sender.pushname ? msg.sender.pushname : msg.from,
+                avatar: msg.sender.profilePicThumbObj.img ? msg.sender.profilePicThumbObj.img : 'none',
+                timestamp: msg.timestamp
+              }
+            }, 
+          );
         } catch (err) {
           console.error(err);
           console.log('Ocorreu um erro ao realizar decode64 do arquivo');
         }    
       }else{
         socket.emit('moduleSend', {
-          msgContent: msg.body,
-          type: msg.type,
-          from: msg.from,
-          to: msg.to,
-          name: msg.sender.pushname ? msg.sender.pushname : msg.from,
-          avatar: msg.sender.profilePicThumbObj.img ? msg.sender.profilePicThumbObj.img : 'none',
-          timestamp: msg.timestamp 
+          room: 'vendergas',
+          data: {
+            msgContent: msg.body,
+            type: msg.type,
+            from: msg.from,
+            to: msg.to,
+            name: msg.sender.pushname ? msg.sender.pushname : msg.from,
+            avatar: msg.sender.profilePicThumbObj.img ? msg.sender.profilePicThumbObj.img : 'none',
+            timestamp: msg.timestamp
+          } 
         });
       }
     } 
@@ -94,14 +101,14 @@ function start(client) {
   client.onStateChange(state => {
     if ('CONFLICT'.includes(state)) {
       kill()
-      socket.emit('errorOnConnect')
+      socket.emit('errorOnConnect', { room: 'vendergas' })
     }
     if ('UNPAIRED'.includes(state)) {
       kill()
-      socket.emit('errorOnConnect')
+      socket.emit('errorOnConnect', { room: 'vendergas' })
     }
     if('CONNECTED'.includes(state)) {
-      socket.emit('successOnConnect')
+      socket.emit('successOnConnect', { room: 'vendergas' })
     }
   })
 
@@ -127,7 +134,15 @@ function start(client) {
         allUnreadMessages[i].body = imagebase64;
       }
     })    
-    socket.emit('listenOldMessages', {clients: chats, hostDevice: device, unreadMessages : allUnreadMessages});
+    socket.emit('listenOldMessages', {
+      room: 'vendergas',
+      data: {
+        room: 'vendergas',
+        clients: chats, 
+        hostDevice: device, 
+        unreadMessages : allUnreadMessages
+      }
+    });
   })
 }
 
@@ -135,7 +150,7 @@ function start(client) {
 ioLocal.on('connection', clientLocal => {
   clientLocal.on('closeConnection', () => {
     kill()
-    socket.emit('errorOnConnect')
+    socket.emit('errorOnConnect', { room: 'vendergas' })
   })
 })
 

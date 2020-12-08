@@ -6,13 +6,14 @@
   "bin": "index.js",
   "scripts": {
     "dev": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "pkg index.js --out-path ./build"
   },
   "pkg": {
     "assets": [
       "node_modules/puppeteer-extra-plugin-stealth/**/*.*",
-      "index.html",
-      "public/*"
+      "./index.html",
+      "./public/*"
     ]
   },
   "author": "",
