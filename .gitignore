@@ -4,5 +4,5 @@ teste-macos
 teste-win.exe
 tokens
 debug.log
-build/wpp-venom-socket-*
+build/wpp-venom-socket*
 directory

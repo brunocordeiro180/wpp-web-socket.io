@@ -1,40 +1,37 @@
 {
-  "name": "wpp-venom-socket.io",
-  "version": "1.0.2",
-  "description": "",
-  "main": "index.js",
-  "bin": {
-    "teste": "index.js"
-  },
-  "scripts": {
-    "dev": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "pkg package.json --out-path ./build"
-  },
-  "pkg": {
-    "assets": [
-      "node_modules/puppeteer-extra-plugin-stealth/**/*.*",
-      "./index.html",
-	  "./public/*",
-	  "./node_modules/venom-bot/**/*"
-    ]
-  },
-  "author": "Bruno",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.17.1",
-    "locate-chrome": "^0.1.1",
-    "nexe": "^3.3.7",
-    "open": "^7.3.0",
-    "puppeteer": "^5.5.0",
-    "puppeteer-core": "^5.5.0",
-    "puppeteer-extra-plugin-stealth": "^2.6.5",
-    "socket.io": "^3.0.4",
-    "socket.io-client": "^3.0.4",
-    "venom-bot": "^2.1.2",
-    "ws": "^7.4.1"
-  },
-  "devDependencies": {
-    "pkg": "^4.4.9"
-  }
+	"name": "wpp-venom-socket.io",
+	"version": "1.0.2",
+	"description": "",
+	"main": "index.js",
+	"bin": {
+		"teste": "index.js"
+	},
+	"scripts": {
+		"dev": "node index.js",
+		"build-win32": "rm -rf build/wpp-venom-socket* && pkg package.json --targets node12-win-x86 --out-path ./build",
+		"build-win64": "rm -rf build/wpp-venom-socket* && pkg package.json --targets node12-win-x64 --out-path ./build",
+		"build-linux32": "rm -rf build/wpp-venom-socket* && pkg package.json --targets node12-linux-x86 --out-path ./build",
+		"build-linux64": "rm -rf build/wpp-venom-socket* && pkg package.json --targets node12-linux-x64 --out-path ./build"
+	},
+	"pkg": {
+		"assets": [
+			"node_modules/puppeteer-extra-plugin-stealth/**/*.*",
+			"./index.html",
+			"./public/*",
+			"./node_modules/venom-bot/**/*"
+		]
+	},
+	"author": "Bruno",
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.17.1",
+		"locate-chrome": "^0.1.1",
+		"open": "^7.3.0",
+		"socket.io": "^3.0.4",
+		"socket.io-client": "^3.0.4",
+		"venom-bot": "git+https://github.com/brunocordeiro180/venom.git"
+	},
+	"devDependencies": {
+		"pkg": "^4.4.9"
+	}
 }
