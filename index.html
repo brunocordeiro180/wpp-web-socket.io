@@ -25,9 +25,43 @@
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<script>
 		var socket = io() // for latest version;
+		changeDOM();
+
+		function changeDOM(){
+			switch (localStorage.getItem("pageStatus")) {
+				case "loading":
+					$('#loading').css("display", "inline");
+					$(".code").html("");
+					$(".isAuth").css("display", "none");
+					break;
+				case "qrCode":
+					let base64Url = localStorage.getItem("base64url");
+					$('#loading').css("display", "none");
+					$(".code").html(`<p>Escaneie o <strong>QR Code</strong> abaixo para sincronizar</p><img src="${base64Url}" alt="">`);
+					$(".isAuth").css("display", "none");
+					break;
+				case "isAuth": 
+					$('#loading').css("display", "none");
+					$(".isAuth").css("display", "inline");
+					$(".code").html("");
+					break;
+				case "isAuthenticated":
+					$('#loading').css("display", "none");
+					$(".isAuth").css("display", "inline");
+					$(".code").html("");
+					break;
+				default:
+					$(".isAuth").css("display", "none");
+					$(".code").html("");
+					$('#loading').css("display", "inline");
+					break;
+			}
+		}
 
 		socket.on("loading", () => {
-			$('#loading').css("display", "inline");
+			localStorage.setItem("pageStatus", "loading");
+			console.log("1");
+			changeDOM();
 		})
 		
 		socket.on("loadingFalse", () => {
@@ -35,27 +69,30 @@
 		})
 
 		socket.on("paring", (base64Url) => {
-			$('#loading').css("display", "none");
-			$(".code").html(`<p>Escaneie o <strong>QR Code</strong> abaixo para sincronizar</p><img src="${base64Url}" alt="">`);
-			$(".isAuth").css("display", "none");
+			localStorage.setItem("pageStatus", "qrCode");
+			localStorage.setItem("base64url", base64Url);
+			console.log("2");
+
+			changeDOM();
 		})
 
 		socket.on("success", () => {
-			$('#loading').css("display", "none");
-			$(".isAuth").css("display", "inline");
-			$(".code").html("");
+			localStorage.setItem("pageStatus", "isAuth");
+			console.log("3");
+
+			changeDOM();
 		})
 
 		socket.on("isAuthenticated", () => {
-			$('#loading').css("display", "none");
-			$(".isAuth").css("display", "inline");
-			$(".code").html("");
+			localStorage.setItem("pageStatus", "isAuthenticated");
+			console.log("4");
+
+			changeDOM();
 		})
 
 		function kill() {
-			console.log('k')
-			$(".isAuth").css("display", "none");
-			$(".code").html("");
+			localStorage.removeItem("base64Url");
+			localStorage.removeItem("pageStatus");
 			socket.emit('closeConnection')	
 		}
 

@@ -5,6 +5,7 @@ var http = require('http').createServer(app);
 var ioLocal = require('socket.io')(http)
 var socket = require('socket.io-client')("http://localhost:3333");
 var venom = require('venom-bot');
+var AutoLaunch = require('auto-launch');
 var locateChrome = require('locate-chrome');
 var open = require('open');
 const rimraf = require('rimraf');
@@ -105,6 +106,9 @@ function start(client) {
 	})
 
 	client.onStateChange(state => {
+		if ('PARING'.includes(state)) {
+			ioLocal.emit("paring", base64Url);
+		}
 		if ('CONFLICT'.includes(state)) {
 			kill()
 			socket.emit('errorOnConnect', { room: 'vendergas' })
@@ -159,6 +163,14 @@ ioLocal.on('connection', clientLocal => {
 		socket.emit('errorOnConnect', { room: 'vendergas' })
 	})
 })
+
+//INICIAR COM O SISTEMA
+const launcher = new AutoLaunch({
+  name: 'wpp-venom-socket.io',
+  path: process.execPath
+})
+
+launcher.enable();
 
 http.listen(4000, () => {
 	open("http://localhost:4000")
