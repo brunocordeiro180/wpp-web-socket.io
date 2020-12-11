@@ -15,7 +15,8 @@
     "assets": [
       "node_modules/puppeteer-extra-plugin-stealth/**/*.*",
       "./index.html",
-      "./public/*"
+	  "./public/*",
+	  "./node_modules/venom-bot/**/*"
     ]
   },
   "author": "Bruno",
@@ -32,5 +33,8 @@
     "socket.io-client": "^3.0.4",
     "venom-bot": "^2.1.2",
     "ws": "^7.4.1"
+  },
+  "devDependencies": {
+    "pkg": "^4.4.9"
   }
 }
