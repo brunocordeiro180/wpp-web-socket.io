@@ -7,7 +7,7 @@
 		"teste": "index.js"
 	},
 	"scripts": {
-		"dev": "node index.js",
+		"dev": "NODE_ENV=development node index.js",
 		"build-win32": "rm -rf build/wpp-venom-socket* && pkg package.json --targets node12-win-x86 --out-path ./build",
 		"build-win64": "rm -rf build/wpp-venom-socket* && pkg package.json --targets node12-win-x64 --out-path ./build",
 		"build-linux32": "rm -rf build/wpp-venom-socket* && pkg package.json --targets node12-linux-x86 --out-path ./build",
