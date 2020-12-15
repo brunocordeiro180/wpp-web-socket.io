@@ -18,7 +18,8 @@
 			"node_modules/puppeteer-extra-plugin-stealth/**/*.*",
 			"./index.html",
 			"./public/*",
-			"./node_modules/venom-bot/**/*"
+			"./node_modules/venom-bot/**/*",
+			"./build/lib/**/*"
 		]
 	},
 	"author": "Bruno",

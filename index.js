@@ -32,7 +32,7 @@ const init = async () => {
 			(statusSession, session) => {
 				if (statusSession === 'qrReadSuccess') {
 					ioLocal.emit('success')
-					socket.emit('successOnConnect', { room: 'vendergas' })
+					socket.emit('successOnConnect', { room: 'ricardoEmpresa' })
 				}
 			},
 			{ logQR: false, autoClose: 0, useChrome: false, puppeteerOptions: { executablePath: chromiumExecutablePath } })
@@ -59,11 +59,11 @@ function kill() {
 function start(client) {
 	//console.log(client);
 	socket.emit('join', {
-		name: 'cliente',
-		room: 'vendergas'
+		name: 'bruno180',
+		room: 'ricardoEmpresa'
 	});
 	client.onMessage(async msg => {
-		console.log(msg);
+		console.log("msg");
 		if (msg.from !== 'status@broadcast') {
 			if (msg.isMedia == true || msg.isMMS == true) {
 				try {
@@ -72,7 +72,7 @@ function start(client) {
 					let imagebase64 = 'data:' + msg.mimetype + ';base64,' + base64data;
 
 					socket.emit('moduleSend', {
-						room: 'vendergas',
+						room: 'ricardoEmpresa',
 						data: {
 							msgContent: imagebase64,
 							type: msg.type,
@@ -90,7 +90,7 @@ function start(client) {
 				}
 			} else {
 				socket.emit('moduleSend', {
-					room: 'vendergas',
+					room: 'ricardoEmpresa',
 					data: {
 						msgContent: msg.body,
 						type: msg.type,
@@ -111,27 +111,39 @@ function start(client) {
 		}
 		if ('CONFLICT'.includes(state)) {
 			kill()
-			socket.emit('errorOnConnect', { room: 'vendergas' })
+			socket.emit('errorOnConnect', { room: 'ricardoEmpresa' })
 		}
 		if ('UNPAIRED'.includes(state)) {
 			kill()
-			socket.emit('errorOnConnect', { room: 'vendergas' })
+			socket.emit('errorOnConnect', { room: 'ricardoEmpresa' })
 		}
 		if ('CONNECTED'.includes(state)) {
-			socket.emit('successOnConnect', { room: 'vendergas' })
+			socket.emit('successOnConnect', { room: 'ricardoEmpresa' })
 		}
 	})
 
 	socket.on('frontReceive', async data => {
-		await client.sendSeen(data.to);
-		client.sendText(data.to, String(data.msgContent));
+		try{
+			console.log(data);
+		}catch(error){
+			console.log(error);
+		}
+		
+		try{
+			await client.sendSeen(data.to);
+			client.sendText(data.to, String(data.msgContent));
+		}catch(e){
+			console.log(e)
+		}
 	})
 
 	socket.on('markAsRead', async data => {
+		console.log("markasread");
 		await client.sendSeen(data);
 	})
 
 	socket.on("oldMessages", async () => {
+		console.log("oldMessages");
 		const chats = await client.getAllChats();
 		const device = await client.getHostDevice();
 		const allUnreadMessages = await client.getUnreadMessages(true, true, true);
@@ -145,9 +157,9 @@ function start(client) {
 			}
 		})
 		socket.emit('listenOldMessages', {
-			room: 'vendergas',
+			room: 'ricardoEmpresa',
 			data: {
-				room: 'vendergas',
+				room: 'ricardoEmpresa',
 				clients: chats,
 				hostDevice: device,
 				unreadMessages: allUnreadMessages
@@ -158,21 +170,22 @@ function start(client) {
 
 
 ioLocal.on('connection', clientLocal => {
+	console.log("connection")
 	clientLocal.on('closeConnection', () => {
 		kill()
-		socket.emit('errorOnConnect', { room: 'vendergas' })
+		socket.emit('errorOnConnect', { room: 'ricardoEmpresa' })
 	})
 })
 
 //INICIAR COM O SISTEMA
-const launcher = new AutoLaunch({
-  name: 'wpp-venom-socket.io',
-  path: process.execPath
-})
+// const launcher = new AutoLaunch({
+//   name: 'wpp-venom-socket.io',
+//   path: process.execPath
+// })
 
-launcher.enable();
+// launcher.enable();
 
 http.listen(4000, () => {
-	open("http://localhost:4000")
+	// open("http://localhost:4000")
 	console.log('listening on *:4000');
 });
