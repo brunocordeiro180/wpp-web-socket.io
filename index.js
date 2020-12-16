@@ -3,7 +3,7 @@ var express = require('express')
 var app = express();
 var http = require('http').createServer(app);
 var ioLocal = require('socket.io')(http)
-var socket = require('socket.io-client')("http://localhost:3333");
+var socket = require('socket.io-client')("https://whatsappapi.vendergas.com.br");
 var venom = require('venom-bot');
 var AutoLaunch = require('auto-launch');
 var locateChrome = require('locate-chrome');
@@ -129,6 +129,16 @@ function start(client) {
 
 	socket.on('markAsRead', async data => {
 		await client.sendSeen(data);
+	})
+
+	socket.on('apiAskBlockedContacts', async () => {
+		const blockedContacts = await client.getBlockList();
+		socket.emit('sendBlockedContacts', {
+			room: 'vendergas',
+			data: {
+				blockedContacts : blockedContacts
+			}
+		});
 	})
 
 	socket.on("oldMessages", async () => {
