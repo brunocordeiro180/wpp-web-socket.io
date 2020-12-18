@@ -32,7 +32,7 @@ const init = async () => {
 			(statusSession, session) => {
 				if (statusSession === 'qrReadSuccess') {
 					ioLocal.emit('success')
-					socket.emit('successOnConnect', { room: 'alissonempresa' })
+					socket.emit('successOnConnect', { room: 'vendergas' })
 				}
 			},
 			{ logQR: false, autoClose: 0, useChrome: false, puppeteerOptions: { executablePath: chromiumExecutablePath } })
@@ -59,8 +59,8 @@ function kill() {
 function start(client) {
 	//console.log(client);
 	socket.emit('join', {
-		name: 'Bruno',
-		room: 'alissonempresa'
+		name: 'cliente',
+		room: 'vendergas'
 	});
 	client.onMessage(async msg => {
 		console.log(msg);
@@ -72,7 +72,7 @@ function start(client) {
 					let imagebase64 = 'data:' + msg.mimetype + ';base64,' + base64data;
 
 					socket.emit('moduleSend', {
-						room: 'alissonempresa',
+						room: 'vendergas',
 						data: {
 							msgContent: imagebase64,
 							type: msg.type,
@@ -90,7 +90,7 @@ function start(client) {
 				}
 			} else {
 				socket.emit('moduleSend', {
-					room: 'alissonempresa',
+					room: 'vendergas',
 					data: {
 						msgContent: msg.body,
 						type: msg.type,
@@ -111,14 +111,14 @@ function start(client) {
 		}
 		if ('CONFLICT'.includes(state)) {
 			kill()
-			socket.emit('errorOnConnect', { room: 'alissonempresa' })
+			socket.emit('errorOnConnect', { room: 'vendergas' })
 		}
 		if ('UNPAIRED'.includes(state)) {
 			kill()
-			socket.emit('errorOnConnect', { room: 'alissonempresa' })
+			socket.emit('errorOnConnect', { room: 'vendergas' })
 		}
 		if ('CONNECTED'.includes(state)) {
-			socket.emit('successOnConnect', { room: 'alissonempresa' })
+			socket.emit('successOnConnect', { room: 'vendergas' })
 		}
 	})
 
@@ -134,7 +134,7 @@ function start(client) {
 	socket.on('apiAskBlockedContacts', async () => {
 		const blockedContacts = await client.getBlockList();
 		socket.emit('sendBlockedContacts', {
-			room: 'alissonempresa',
+			room: 'vendergas',
 			data: {
 				blockedContacts : blockedContacts
 			}
@@ -155,9 +155,9 @@ function start(client) {
 			}
 		})
 		socket.emit('listenOldMessages', {
-			room: 'alissonempresa',
+			room: 'vendergas',
 			data: {
-				room: 'alissonempresa',
+				room: 'vendergas',
 				clients: chats,
 				hostDevice: device,
 				unreadMessages: allUnreadMessages
@@ -170,7 +170,7 @@ function start(client) {
 ioLocal.on('connection', clientLocal => {
 	clientLocal.on('closeConnection', () => {
 		kill()
-		socket.emit('errorOnConnect', { room: 'alissonempresa' })
+		socket.emit('errorOnConnect', { room: 'vendergas' })
 	})
 })
 
